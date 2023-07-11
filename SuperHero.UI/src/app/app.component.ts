@@ -1,38 +1,34 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/internal/Observable';
-import { environment } from 'src/environments/environment';
+import { Component } from '@angular/core';
 import { SuperHero } from './models/super-hero';
+import { SuperHeroService } from './services/super-hero.service';
 
-@Injectable({
-  providedIn: 'root',
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
 })
-export class SuperHeroService {
-  private url = 'SuperHero';
+export class AppComponent {
+  title = 'SuperHero.UI';
+  heroes: SuperHero[] = [];
+  heroToEdit?: SuperHero;
 
-  constructor(private http: HttpClient) {}
+  constructor(private superHeroService: SuperHeroService) {}
 
-  public getSuperHeroes(): Observable<SuperHero[]> {
-    return this.http.get<SuperHero[]>(`${environment.apiUrl}/${this.url}`);
+  ngOnInit(): void {
+    this.superHeroService
+      .getSuperHeroes()
+      .subscribe((result: SuperHero[]) => (this.heroes = result));
   }
 
-  public updateHero(hero: SuperHero): Observable<SuperHero[]> {
-    return this.http.put<SuperHero[]>(
-      `${environment.apiUrl}/${this.url}`,
-      hero
-    );
+  updateHeroList(heroes: SuperHero[]) {
+    this.heroes = heroes;
   }
 
-  public createHero(hero: SuperHero): Observable<SuperHero[]> {
-    return this.http.post<SuperHero[]>(
-      `${environment.apiUrl}/${this.url}`,
-      hero
-    );
+  initNewHero(id: number, name: string, firstName: string, lastName: string, place: string) {
+    this.heroToEdit = new SuperHero(id, name, firstName, lastName, place);
   }
 
-  public deleteHero(hero: SuperHero): Observable<SuperHero[]> {
-    return this.http.delete<SuperHero[]>(
-      `${environment.apiUrl}/${this.url}/${hero.id}`
-    );
+  editHero(hero: SuperHero) {
+    this.heroToEdit = hero;
   }
 }
